@@ -3,14 +3,10 @@
 #include <cmath>
 #include <iostream>
 
-NoisyChannelSolver::NoisyChannelSolver(const unordered_set<string>& dict,
-                                       const unordered_map<string, int>& frequencies,
-                                       Solver& distancer_)
+NoisyChannelSolver::NoisyChannelSolver(const unordered_set<string>& dict, const unordered_map<string, int>& frequencies, Solver& distancer_)
         : Solver(dict), word_frequencies(frequencies), distancer(distancer_) {
 
-    for (const auto& pair : word_frequencies) {
-        total_words_count += pair.second;
-    }
+    for (const auto& pair : word_frequencies) total_words_count += pair.second;
     if (total_words_count == 0) total_words_count = 1;
 
     initConfusionMatrices();
