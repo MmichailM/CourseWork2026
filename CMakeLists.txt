@@ -14,3 +14,5 @@ add_executable(main main.cpp
         TrigramSolver.h
         NoisyChannelSolver.cpp
         NoisyChannelSolver.h)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/input_data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

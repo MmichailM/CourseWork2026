@@ -16,8 +16,8 @@ unordered_map<string, double> form_frequencies(const string& filename);
 void printTableAccurates(Solver* solver, const string& filename10, const string& filename100, const string& filename500);
 
 int main() {
-    string dict_filename = "dictionary.txt";
-    string freq_filename = "freqdictionary.txt";
+    string dict_filename = "./input_data/dictionary.txt";
+    string freq_filename = "./input_data/freqdictionary.txt";
 
     unordered_set<string> test_dictionary = form_dictionary(dict_filename);
     unordered_map<string, double> freqs = form_frequencies(freq_filename);
@@ -27,10 +27,10 @@ int main() {
     TrigramSolver ts(test_dictionary);
     NoisyChannelSolver ncs(test_dictionary, freqs, dls);
 
-    printTableAccurates(&ls, "test10.txt", "test100.txt", "test500.txt");
-    printTableAccurates(&dls, "test10.txt", "test100.txt", "test500.txt");
-    printTableAccurates(&ts, "test10.txt", "test100.txt", "test500.txt");
-    printTableAccurates(&ncs, "test10.txt", "test100.txt", "test500.txt");
+    printTableAccurates(&ls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
+    printTableAccurates(&dls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
+    printTableAccurates(&ts, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
+    printTableAccurates(&ncs, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
 }
 
 vector<pair<string, string>> read_typos(const string& filename) {
