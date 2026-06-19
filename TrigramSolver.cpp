@@ -20,7 +20,7 @@ set<TrigramSolver::Trigram> TrigramSolver::getTrigrams(const string &word) {
 }
 
 string TrigramSolver::getAlgorithmName() const {
-    return "Триграммный метод";
+    return "Триграммный метод\n\n";
 }
 
 Result TrigramSolver::solve(const string &typo) {
@@ -55,7 +55,7 @@ Result TrigramSolver::solve(const string &typo) {
         }
     }
 
-    return {candidates, best};
+    return {typo, candidates, best};
 }
 
 void TrigramSolver::buildIndex() {
@@ -65,4 +65,13 @@ void TrigramSolver::buildIndex() {
         set<Trigram> word_trigrams = getTrigrams(word);
         for (const Trigram& t : word_trigrams) inverted_index[t].push_back(word);
     }
+}
+
+void TrigramSolver::printResult(const Result &res) const {
+    cout << getAlgorithmName();
+    cout << "Введенное слово: " << res.word << "\n\n";
+    cout << "Кандидаты:\n";
+    int count = 1;
+    for (string word : res.candidates) cout << "\t" + to_string(count++) + ") " << word << "\n";
+    cout << "Коэффициент Жаккара: " << res.score << "\n";
 }

@@ -25,7 +25,7 @@ int DamerauLevenshteinSolver::calculateLevenshteinDistance(const string &s1, con
 }
 
 string DamerauLevenshteinSolver::getAlgorithmName() const {
-    return "Алгоритм Дамерау-Левенштейна";
+    return "Алгоритм Дамерау-Левенштейна\n\n";
 }
 
 Result DamerauLevenshteinSolver::solve(const string &typo) {
@@ -42,5 +42,14 @@ Result DamerauLevenshteinSolver::solve(const string &typo) {
         }
     }
 
-    return {words, best};
+    return {typo, words, best};
+}
+
+void DamerauLevenshteinSolver::printResult(const Result &res) const {
+    cout << getAlgorithmName();
+    cout << "Введенное слово: " << res.word << "\n\n";
+    cout << "Кандидаты:\n";
+    int count = 1;
+    for (string word : res.candidates) cout << "\t" + to_string(count++) + ") " << word << "\n";
+    cout << "Редакционное расстояние: " << (int)res.score << "\n";
 }

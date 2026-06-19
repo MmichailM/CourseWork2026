@@ -10,6 +10,8 @@ public:
 
     string getAlgorithmName() const override;
     Result solve(const string& typo) override;
+
+    void printResult(const Result& res) const override;
 };
 
 

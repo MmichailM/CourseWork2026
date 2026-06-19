@@ -25,7 +25,7 @@ int LevenshteinSolver::calculateLevenshteinDistance(const string &s1, const stri
 }
 
 string LevenshteinSolver::getAlgorithmName() const {
-    return "Алгоритм Левенштейна";
+    return "Алгоритм Левенштейна\n\n";
 }
 
 Result LevenshteinSolver::solve(const string &typo) {
@@ -42,5 +42,14 @@ Result LevenshteinSolver::solve(const string &typo) {
         }
     }
 
-    return {words, best};
+    return {typo, words, best};
+}
+
+void LevenshteinSolver::printResult(const Result &res) const {
+    cout << getAlgorithmName();
+    cout << "Введенное слово: " << res.word << "\n\n";
+    cout << "Кандидаты:\n";
+    int count = 1;
+    for (string word : res.candidates) cout << "\t" + to_string(count++) + ") " << word << "\n";
+    cout << "Редакционное расстояние: " << (int)res.score << "\n";
 }

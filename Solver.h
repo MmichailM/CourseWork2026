@@ -6,10 +6,12 @@
 #include <unordered_set>
 #include <set>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
 struct Result {
+    string word;
     vector<string> candidates;
     double score;
 };
@@ -24,6 +26,8 @@ public:
 
     virtual string getAlgorithmName() const = 0;
     virtual Result solve(const string& typo) = 0;
+
+    virtual void printResult(const Result& res) const = 0;
 
     virtual ~Solver() = default;
 };

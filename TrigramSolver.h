@@ -8,7 +8,7 @@
 
 const double eps = pow(10, -5);
 
-class TrigramSolver : Solver {
+class TrigramSolver : public Solver {
     struct Trigram {
         int c1, c2, c3;
 
@@ -30,6 +30,8 @@ public:
 
     string getAlgorithmName() const override;
     Result solve(const string& typo) override;
+
+    void printResult(const Result& res) const override;
 };
 
 
