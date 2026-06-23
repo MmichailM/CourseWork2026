@@ -5,15 +5,21 @@
 #include <iomanip>
 #include <chrono>
 
+struct Metric {
+    double Acc1;
+    double Acc3;
+    double Time;
+};
+
 vector<pair<string, string>> read_typos(const string& filename);
-double Accurate1(const string& filename, Solver* solver);
-double Accurate3(const string& filename, Solver* solver);
-double GetTime(const string& filename, Solver* solver);
+
+Metric GetMetric(const string& filename, Solver* solver);
 
 unordered_set<string> form_dictionary(const string& filename);
 unordered_map<string, double> form_frequencies(const string& filename);
 
-void printTableAccurates(Solver* solver, const string& filename10, const string& filename100, const string& filename500);
+void printTableAccurates(Solver* solver, const string& filename10, const string& filename100, const string& filename500, const string& filename5000);
+void printSolveTable(Solver* solver, const string& filename);
 
 int main() {
     string dict_filename = "./input_data/dictionary.txt";
@@ -27,27 +33,38 @@ int main() {
     TrigramSolver ts(test_dictionary);
     NoisyChannelSolver ncs(test_dictionary, freqs, dls);
 
-    printTableAccurates(&ls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
-    printTableAccurates(&dls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
-    printTableAccurates(&ts, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
-    printTableAccurates(&ncs, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt");
+    printTableAccurates(&ls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt", "./input_data/test5000.txt");
+    printTableAccurates(&dls, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt", "./input_data/test5000.txt");
+    printTableAccurates(&ts, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt", "./input_data/test5000.txt");
+    printTableAccurates(&ncs, "./input_data/test10.txt", "./input_data/test100.txt", "./input_data/test500.txt", "./input_data/test5000.txt");
+
+    printSolveTable(&ls, "./input_data/test5000many.txt");
+    printSolveTable(&dls, "./input_data/test5000many.txt");
+    printSolveTable(&ts, "./input_data/test5000many.txt");
+    printSolveTable(&ncs, "./input_data/test5000many.txt");
+
+//    Result res = ls.solve("разраоткба");
+//    ls.printResult(res);
 }
 
-vector<pair<string, string>> read_typos(const string& filename) {
-    ifstream fin(filename);
-    vector<pair<string, string>> vec;
-    string line;
-    while (getline(fin, line)) {
-        int i = 0;
-        string s1, s2;
-        while (line[i] != ' ' && line[i] != '\t') s1.push_back(line[i++]);
-        while (line[i] == ' ' || line[i] == '\t') i++;
-        for (i; i < line.size(); i++) s2.push_back(line[i]);
-        vec.push_back({s1, s2});
+std::vector<std::pair<std::string, std::string>> read_typos(const std::string& filename) {
+    std::ifstream fin(filename);
+    if (!fin.is_open()) {
+        return {}; // Защита на случай, если файл не удалось открыть
     }
-    fin.close();
-    return vec;
+
+    std::vector<std::pair<std::string, std::string>> vec;
+    std::string s1, s2;
+
+    // Оператор >> автоматически пропускает любые пробельные символы (пробелы, табы, переносы строк)
+    while (fin >> s1 >> s2) {
+        // Избегаем копирования строк, перемещая (move) их прямо в вектор
+        vec.emplace_back(std::move(s1), std::move(s2));
+    }
+
+    return vec; // fin.close() вызовется автоматически при выходе из функции
 }
+
 
 unordered_set<string> form_dictionary(const string& filename) {
     ifstream fin(filename);
@@ -67,7 +84,7 @@ unordered_map<string, double> form_frequencies(const string& filename) {
     while (getline(fin, line)) {
         string word;
         string number;
-        int freq;
+        double freq;
         int i = 0;
         while (line[i] != '\t') word.push_back(line[i++]);
         i++;
@@ -80,51 +97,48 @@ unordered_map<string, double> form_frequencies(const string& filename) {
     return frequencies;
 }
 
-double Accurate1(const string& filename, Solver* solver) {
-    auto typos = read_typos(filename);
-    int acc1 = 0;
-    for (auto typo : typos) {
-        Result res = solver->solve(typo.first);
-        if (res.candidates.size() != 0 && res.candidates[0] == typo.second) acc1++;
-    }
+void printTableAccurates(Solver* solver, const string& filename10, const string& filename100, const string& filename500, const string& filename5000) {
+    Metric f10 = GetMetric(filename10, solver);
+    Metric f100 = GetMetric(filename100, solver);
+    Metric f500 = GetMetric(filename500, solver);
+    Metric f5000 = GetMetric(filename5000, solver);
 
-    return (double) acc1 / (double) typos.size() * 100;
+    cout << solver->getAlgorithmName();
+    cout << "\tМетрика\t\t10\t100\t500\t5000\n"
+
+    << "\tAccuracy@1\t" << f10.Acc1 << "%" << "\t" << f100.Acc1 << "%" << "\t" << f500.Acc1 << "%" << "\t" << f5000.Acc1 << "%" << "\n"
+    << "\tAccuracy@3\t" << f10.Acc3 << "%" << "\t" << f100.Acc3 << "%" << "\t" << f500.Acc3 << "%" << "\t" << f5000.Acc3 << "%" << "\n"
+    << "\tСр. время работы\t" << f10.Time << " мс" << "\t" << f100.Time << " мс" << "\t" << f500.Time << " мс" << "\t" << f5000.Time << "мс" << "\n\n\n";
 }
 
-double Accurate3(const string& filename, Solver* solver) {
+Metric GetMetric(const string& filename, Solver* solver) {
     auto typos = read_typos(filename);
-    int acc3 = 0;
+    int acc1 = 0, acc3 = 0;
+
+    auto start = chrono::high_resolution_clock::now();
     for (const auto& typo : typos) {
         Result res = solver->solve(typo.first);
+        if (res.candidates.size() != 0 && res.candidates[0] == typo.second) acc1++;
         bool correct = false;
-        for (int i = 0; i < min(3, (int)res.candidates.size()); i++) {
+        for (int i = 0; i < min(3, (int)res.candidates.size()) && !correct; i++) {
             if (res.candidates[i] == typo.second) {
                 correct = true;
-                break;
             }
         }
         if (correct) acc3++;
     }
-
-    return (double) acc3 / (double) typos.size() * 100;
-}
-
-void printTableAccurates(Solver* solver, const string& filename10, const string& filename100, const string& filename500) {
-    cout << solver->getAlgorithmName();
-    cout << "\tМетрика\t\t10\t100\t500\n"
-    << "\tAccuracy@1\t" << Accurate1(filename10, solver) << "%" << "\t" << Accurate1(filename100, solver) << "%" << "\t" << Accurate1(filename500, solver) << "%" << "\n"
-    << "\tAccuracy@3\t" << Accurate3(filename10, solver) << "%" << "\t" << Accurate3(filename100, solver) << "%" << "\t" << Accurate3(filename500, solver) << "%" << "\n"
-    << "\tСр. время работы\t" << GetTime(filename10, solver) << " мс" << "\t" << GetTime(filename100, solver) << " мс" << "\t" << GetTime(filename500, solver) << " мс" << "\n\n\n";
-}
-
-double GetTime(const string& filename, Solver* solver) {
-    auto typos = read_typos(filename);
-
-    auto start = chrono::high_resolution_clock::now();
-    for (const auto& typo : typos) solver->solve(typo.first);
     auto end = chrono::high_resolution_clock::now();
 
     chrono::duration<double, milli> duration = end - start;
 
-    return duration.count() / (double)typos.size();
+    return {acc1 / (double)typos.size() * 100, acc3 / (double)typos.size() * 100, duration.count() / (double)typos.size()};
+}
+
+void printSolveTable(Solver* solver, const string& filename) {
+    Metric m = GetMetric(filename, solver);
+    cout << "\tМетрика\t\t5000\n"
+
+            << "\tAccuracy@1\t" << m.Acc1 << "%" << "\n"
+            << "\tAccuracy@3\t" << m.Acc3 << "%" << "\n"
+            << "\tСр. время работы\t" << m.Time << " мс" << "\n\n\n";
 }
