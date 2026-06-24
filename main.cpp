@@ -47,22 +47,16 @@ int main() {
 //    ls.printResult(res);
 }
 
-std::vector<std::pair<std::string, std::string>> read_typos(const std::string& filename) {
-    std::ifstream fin(filename);
-    if (!fin.is_open()) {
-        return {}; // Защита на случай, если файл не удалось открыть
-    }
+vector<pair<string, string>> read_typos(const string& filename) {
+    ifstream fin(filename);
+    if (!fin.is_open()) return {};
 
-    std::vector<std::pair<std::string, std::string>> vec;
-    std::string s1, s2;
+    vector<pair<string, string>> vec;
+    string s1, s2;
 
-    // Оператор >> автоматически пропускает любые пробельные символы (пробелы, табы, переносы строк)
-    while (fin >> s1 >> s2) {
-        // Избегаем копирования строк, перемещая (move) их прямо в вектор
-        vec.emplace_back(std::move(s1), std::move(s2));
-    }
+    while (fin >> s1 >> s2) vec.emplace_back(std::move(s1), std::move(s2));
 
-    return vec; // fin.close() вызовется автоматически при выходе из функции
+    return vec;
 }
 
 
